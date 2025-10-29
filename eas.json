@@ -6,19 +6,13 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "env": {
-        "EAS_SUBMODULE_SSH_KEY": "@EAS_SUBMODULE_SSH_KEY"
-      }
+      "distribution": "internal"
     },
     "preview": {
       "distribution": "internal"
     },
     "production": {
       "autoIncrement": true,
-      "env": {
-        "EAS_SUBMODULE_SSH_KEY": "@EAS_SUBMODULE_SSH_KEY"
-      },
       "android": {
         "buildType": "apk"
       }
