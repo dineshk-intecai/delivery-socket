@@ -1,0 +1,4 @@
+[submodule "packages/native-socket-connection"]
+	path = packages/native-socket-connection
+	url = https://github.com/intecai/native-components.git
+	branch = native-socket-connection
