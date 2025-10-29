@@ -3,11 +3,20 @@ import * as NativeSocketConnection from 'native-socket-connection';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 
-NativeSocketConnection.setSocketUrl('http://192.168.0.120:3000');
+const SOCKET_URL = process.env.EXPO_PUBLIC_SOCKET_URL;
+NativeSocketConnection.setSocketUrl(SOCKET_URL || '');
+
+type Location = {
+	lat: number;
+	lng: number;
+}
 
 export default function App() {
 	const [isEnabled, setIsEnabled] = useState(false);
 	const watchRef = useRef<Location.LocationSubscription | null>(null);
+
+	const [location, setLocation] = useState<Location | null>(null);
+	const [partnerId, setPartnerId] = useState<string | null>(null);
 
 	const startService = async () => {
 		const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
@@ -39,8 +48,35 @@ export default function App() {
 		if (!isEnabled) return;
 
 		let isCancelled = false;
-
 		start(isCancelled);
+
+		NativeSocketConnection.listen('onConnect');
+		NativeSocketConnection.listen('onDisconnect');
+		NativeSocketConnection.listen('onError');
+		NativeSocketConnection.listen('live_location');
+		NativeSocketConnection.listen('live_location_partnerId');
+
+		const connect = NativeSocketConnection.addListener('onConnect', () => {
+			console.log('on connect', '--->', 'Connected to server');
+		});
+		const disconnect = NativeSocketConnection.addListener('onDisconnect', () => {
+			console.log('on disconnect', '--->', 'Disconnected from server');
+		});
+		const error = NativeSocketConnection.addListener('onError', (error) => {
+			console.log('on error', '--->', error);
+		});
+
+		const liveLocation = NativeSocketConnection.addListener('live_location', (data) => {
+			setLocation({
+				lat: data.lat,
+				lng: data.lng,
+			});
+		});
+
+		const liveLocationPartnerId = NativeSocketConnection.addListener('live_location_partnerId', (data) => {
+			setPartnerId(data.partnerId);
+
+		});
 
 		return () => {
 			isCancelled = true;
@@ -48,6 +84,11 @@ export default function App() {
 				watchRef.current.remove();
 				watchRef.current = null;
 			}
+			connect.remove();
+			disconnect.remove();
+			error.remove();
+			liveLocation.remove();
+			liveLocationPartnerId.remove();
 		};
 	}, [isEnabled]);
 
@@ -59,7 +100,11 @@ export default function App() {
 			},
 			(loc) => {
 				const { latitude, longitude } = loc.coords;
-				NativeSocketConnection.sendLocation(latitude, longitude);
+				NativeSocketConnection.emit('location_update', {
+					lat: latitude,
+					lng: longitude,
+					partnerId: 'partner_12345'
+				});
 			}
 		);
 
@@ -72,7 +117,8 @@ export default function App() {
 	return (
 		<View style={styles.container}>
 			<StatusBar barStyle="dark-content" />
-			{isEnabled && <Text>Service is running</Text>}
+			{isEnabled && <Text style={{ textAlign: 'center' }}>Service is running for partner {`\n ${partnerId}`}</Text>}
+			{location && <Text>Location : {JSON.stringify(location, null, 4)}</Text>}
 
 			<TouchableOpacity
 				activeOpacity={0.8}
