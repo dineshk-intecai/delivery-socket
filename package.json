@@ -25,7 +25,6 @@
     "expo-splash-screen": "~31.0.10",
     "expo-system-ui": "~6.0.8",
     "expo-web-browser": "~15.0.8",
-    "native-socket-connection": "file:./modules/native-socket-connection",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",

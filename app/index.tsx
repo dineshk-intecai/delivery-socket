@@ -1,5 +1,5 @@
 import { StatusBar, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
-import * as NativeSocketConnection from 'native-socket-connection';
+import * as NativeSocketConnection from '../modules/native-socket-connection';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 
