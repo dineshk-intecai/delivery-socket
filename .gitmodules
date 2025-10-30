@@ -1,3 +1,0 @@
-[submodule "packages/native-socket-connection"]
-	path = packages/native-socket-connection
-	url = https://github.com/dineshk-intecai/native-socket-connection.git
