@@ -75,7 +75,6 @@ export default function App() {
 
 		const liveLocationPartnerId = NativeSocketConnection.addListener('live_location_partnerId', (data) => {
 			setPartnerId(data.partnerId);
-
 		});
 
 		return () => {
