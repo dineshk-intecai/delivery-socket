@@ -2,6 +2,8 @@ import { StatusBar, StyleSheet, Text, TouchableOpacity, View, Alert } from 'reac
 import * as NativeSocketConnection from 'native-socket-connection';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
+import { partnerId } from '@/utils';
+import { sendNotify } from '@/services';
 
 const SOCKET_URL = process.env.EXPO_PUBLIC_SOCKET_URL;
 NativeSocketConnection.setSocketUrl(SOCKET_URL || '');
@@ -16,7 +18,7 @@ export default function App() {
 	const watchRef = useRef<Location.LocationSubscription | null>(null);
 
 	const [location, setLocation] = useState<Location | null>(null);
-	const [partnerId, setPartnerId] = useState<string | null>(null);
+	const [userId, setUserId] = useState<string | null>(null);
 
 	const startService = async () => {
 		const { status: fgStatus } = await Location.requestForegroundPermissionsAsync();
@@ -44,6 +46,12 @@ export default function App() {
 		setIsEnabled(false);
 	};
 
+
+
+	const notifyUser = async (title: string, message: string) => {
+		await sendNotify(title, message);
+	};
+
 	useEffect(() => {
 		if (!isEnabled) return;
 
@@ -57,13 +65,14 @@ export default function App() {
 		NativeSocketConnection.listen('live_location_partnerId');
 
 		const connect = NativeSocketConnection.addListener('onConnect', () => {
-			console.log('on connect', '--->', 'Connected to server');
+			notifyUser('Socket Connection', 'Connected to server');
+			console.log('on connect ---> Connected to server');
 		});
 		const disconnect = NativeSocketConnection.addListener('onDisconnect', () => {
-			console.log('on disconnect', '--->', 'Disconnected from server');
+			console.log('on disconnect ---> Disconnected from server');
 		});
 		const error = NativeSocketConnection.addListener('onError', (error) => {
-			console.log('on error', '--->', error);
+			console.log('on error --->', error);
 		});
 
 		const liveLocation = NativeSocketConnection.addListener('live_location', (data) => {
@@ -74,7 +83,7 @@ export default function App() {
 		});
 
 		const liveLocationPartnerId = NativeSocketConnection.addListener('live_location_partnerId', (data) => {
-			setPartnerId(data.partnerId);
+			setUserId(data.partnerId);
 		});
 
 		return () => {
@@ -102,7 +111,7 @@ export default function App() {
 				NativeSocketConnection.emit('location_update', {
 					lat: latitude,
 					lng: longitude,
-					partnerId: 'partner_12345'
+					partnerId
 				});
 			}
 		);
@@ -116,8 +125,8 @@ export default function App() {
 	return (
 		<View style={styles.container}>
 			<StatusBar barStyle="dark-content" />
-			{isEnabled && <Text style={{ textAlign: 'center' }}>Service is running for partner {`\n ${partnerId}`}</Text>}
-			{location && <Text>Location : {JSON.stringify(location, null, 4)}</Text>}
+			{isEnabled && <Text style={{ textAlign: 'center' }}>Service is running for partner{`\n${userId}`}</Text>}
+			{location && <Text>Latitude : {location.lat} {'\n'}Longitude : {location.lng}</Text>}
 
 			<TouchableOpacity
 				activeOpacity={0.8}

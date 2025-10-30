@@ -36,6 +36,7 @@ class LocationSocketService : Service() {
             try {
                 if (socket?.connected() == true) {
                     val data = JSONObject(payload)
+                    Log.d(TAG, "Emitting event: $event with data: $data")
                     socket?.emit(event, data)
                 } else {
                     Log.w(TAG, "Socket not connected, cannot emit event.")
