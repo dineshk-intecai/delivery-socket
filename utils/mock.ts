@@ -1,1 +1,1 @@
-export const partnerId = "partner_12345";
+export const partnerId = 'partner_12345';

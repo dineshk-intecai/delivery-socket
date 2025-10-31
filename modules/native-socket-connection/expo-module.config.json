@@ -1,9 +1,9 @@
 {
-  "platforms": ["apple", "android", "web"],
-  "apple": {
-    "modules": ["NativeSocketConnectionModule"]
-  },
-  "android": {
-    "modules": ["expo.modules.nativesocketconnection.NativeSocketConnectionModule"]
-  }
+    "platforms": ["apple", "android", "web"],
+    "apple": {
+        "modules": ["NativeSocketConnectionModule"]
+    },
+    "android": {
+        "modules": ["expo.modules.nativesocketconnection.NativeSocketConnectionModule"]
+    }
 }

@@ -4,6 +4,6 @@ dist
 .expo
 .expo-shared
 coverage
-android
-ios
+/android
+/ios
 package-lock.json
